@@ -1,0 +1,87 @@
+name: "Xithex Services Action"
+description: "Start ephemeral service containers (PostgreSQL, Redis, etc.) using Podman on self-hosted runners."
+author: "Xithex"
+
+inputs:
+  services:
+    description: "Whitespace or comma separated list of services to start (supported: postgresql, redis)."
+    required: true
+  postgres-version:
+    description: "Container tag for PostgreSQL."
+    required: false
+    default: "16"
+  postgres-port:
+    description: "Base host port for PostgreSQL (auto-increments if occupied)."
+    required: false
+    default: "55432"
+  postgres-password:
+    description: "Password for the postgres superuser."
+    required: false
+    default: "postgres"
+  redis-version:
+    description: "Container tag for Redis."
+    required: false
+    default: "7-alpine"
+  redis-port:
+    description: "Base host port for Redis (auto-increments if occupied)."
+    required: false
+    default: "16379"
+  network:
+    description: "Optional Podman network to attach containers to (defaults to runner bridge)."
+    required: false
+    default: ""
+
+outputs:
+  database-url:
+    description: "Connection URL for PostgreSQL if started."
+    value: ${{ steps.export.outputs.database-url }}
+  redis-url:
+    description: "Connection URL for Redis if started."
+    value: ${{ steps.export.outputs.redis-url }}
+  postgres-port:
+    description: "Allocated host port for PostgreSQL."
+    value: ${{ steps.export.outputs.postgres-port }}
+  redis-port:
+    description: "Allocated host port for Redis."
+    value: ${{ steps.export.outputs.redis-port }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: start
+      name: Start requested services
+      shell: bash
+      env:
+        REQUESTED_SERVICES: ${{ inputs.services }}
+        POSTGRES_VERSION: ${{ inputs.postgres-version }}
+        POSTGRES_PORT_BASE: ${{ inputs.postgres-port }}
+        POSTGRES_PASSWORD: ${{ inputs.postgres-password }}
+        REDIS_VERSION: ${{ inputs.redis-version }}
+        REDIS_PORT_BASE: ${{ inputs.redis-port }}
+        NETWORK: ${{ inputs.network }}
+        STATE_FILE: ${{ runner.temp }}/xithex-services-${{ github.run_id }}-${{ github.job }}.state
+        ENV_FILE: ${{ runner.temp }}/xithex-services-${{ github.run_id }}-${{ github.job }}.env
+        OUTPUT_FILE: ${{ runner.temp }}/xithex-services-${{ github.run_id }}-${{ github.job }}.out
+      run: ${{ github.action_path }}/scripts/start-services.sh
+
+    - id: export
+      name: Export environment and outputs
+      shell: bash
+      env:
+        ENV_FILE: ${{ runner.temp }}/xithex-services-${{ github.run_id }}-${{ github.job }}.env
+        OUTPUT_FILE: ${{ runner.temp }}/xithex-services-${{ github.run_id }}-${{ github.job }}.out
+      run: |
+        set -eo pipefail
+        if [[ -f "$ENV_FILE" ]]; then
+          cat "$ENV_FILE" >> "$GITHUB_ENV"
+        fi
+        if [[ -f "$OUTPUT_FILE" ]]; then
+          cat "$OUTPUT_FILE" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Stop services
+      if: always()
+      shell: bash
+      env:
+        STATE_FILE: ${{ runner.temp }}/xithex-services-${{ github.run_id }}-${{ github.job }}.state
+      run: ${{ github.action_path }}/scripts/cleanup-services.sh
