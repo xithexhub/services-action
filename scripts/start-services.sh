@@ -71,6 +71,7 @@ start_postgresql() {
 
   local run_args=(
     --detach
+    --replace
     --name "$container"
     --env "POSTGRES_PASSWORD=$password"
     --env "POSTGRES_USER=postgres"
@@ -123,6 +124,7 @@ start_redis() {
 
   local run_args=(
     --detach
+    --replace
     --name "$container"
     --publish "${host_port}:6379"
   )
