@@ -2,7 +2,7 @@
 
 Composite GitHub Action for Xithex self-hosted runners that starts ephemeral
 PostgreSQL and Redis containers via Podman. It replaces the legacy
-`nix-services-action` so our CI pipelines stay Nix-free.
+Nix-based services action so our CI pipelines stay Nix-free.
 
 ## Usage
 
