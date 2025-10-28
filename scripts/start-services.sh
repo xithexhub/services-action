@@ -53,6 +53,8 @@ ensure_env_files() {
   : > "$STATE_FILE"
   : > "$ENV_FILE"
   : > "$OUTPUT_FILE"
+  write_env SERVICES_ACTION_STATE_FILE "$STATE_FILE"
+  append_output state-file "$STATE_FILE"
 }
 
 start_postgresql() {

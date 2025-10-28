@@ -79,9 +79,11 @@ runs:
           cat "$OUTPUT_FILE" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Stop services
-      if: always()
+    - name: Record state file
       shell: bash
       env:
         STATE_FILE: ${{ runner.temp }}/xithex-services-${{ github.run_id }}-${{ github.job }}.state
-      run: ${{ github.action_path }}/scripts/cleanup-services.sh
+      run: |
+        if [[ -f "$STATE_FILE" ]]; then
+          echo "SERVICES_ACTION_STATE_FILE=$STATE_FILE" >> "$GITHUB_ENV"
+        fi
