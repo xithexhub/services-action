@@ -17,7 +17,18 @@ require_command() {
 find_free_port() {
   local start_port=$1
   local port="$start_port"
-  while ss -ltn "( sport = :$port )" >/dev/null 2>&1; do
+  while python3 - "$port" <<'PY'; do
+import socket
+import sys
+
+port = int(sys.argv[1])
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    try:
+        sock.bind(("127.0.0.1", port))
+    except OSError:
+        sys.exit(0)
+sys.exit(1)
+PY
     port=$((port + 1))
     if (( port > 65535 )); then
       die "No available ports starting from $start_port"
@@ -145,7 +156,7 @@ start_redis() {
 
 main() {
   require_command podman
-  require_command ss
+  require_command python3
 
   if [[ -z "${REQUESTED_SERVICES:-}" ]]; then
     die "No services requested. Provide at least one service name."
