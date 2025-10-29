@@ -23,6 +23,9 @@ environment variables for subsequent steps):
 | `postgres-port`   | Host port allocated for PostgreSQL        |
 | `redis-url`       | Redis connection string                   |
 | `redis-port`      | Host port allocated for Redis             |
+| `network`         | Podman network the containers joined      |
+| `postgres-container` | Name of the PostgreSQL container       |
+| `redis-container` | Name of the Redis container               |
 
 ### Inputs
 
@@ -44,5 +47,7 @@ environment variables for subsequent steps):
 
 ## Cleanup
 
-Containers are automatically removed in the final step of the action (`if:
-always()`), even if earlier steps fail.
+The action records container names (and the optional network) in
+`SERVICES_ACTION_STATE_FILE`. Use the accompanying `scripts/cleanup-services.sh`
+helper (or your own teardown logic) to remove them once they are no longer
+needed.

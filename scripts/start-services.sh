@@ -55,6 +55,10 @@ ensure_env_files() {
   : > "$OUTPUT_FILE"
   write_env SERVICES_ACTION_STATE_FILE "$STATE_FILE"
   append_output state-file "$STATE_FILE"
+  if [[ -n "${NETWORK:-}" ]]; then
+    write_env SERVICES_ACTION_NETWORK "$NETWORK"
+    append_output network "$NETWORK"
+  fi
 }
 
 start_postgresql() {
@@ -88,6 +92,8 @@ start_postgresql() {
     -c max_connections=200 >/dev/null
 
   echo "$container" >> "$STATE_FILE"
+  write_env SERVICES_ACTION_POSTGRES_CONTAINER "$container"
+  append_output postgres-container "$container"
 
   for attempt in {1..30}; do
     if podman exec "$container" pg_isready -U postgres >/dev/null 2>&1; then
@@ -136,6 +142,8 @@ start_redis() {
   podman run "${run_args[@]}" "docker.io/library/redis:${version}" >/dev/null
 
   echo "$container" >> "$STATE_FILE"
+  write_env SERVICES_ACTION_REDIS_CONTAINER "$container"
+  append_output redis-container "$container"
 
   for attempt in {1..30}; do
     if podman exec "$container" redis-cli ping >/dev/null 2>&1; then

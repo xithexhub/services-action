@@ -44,6 +44,15 @@ outputs:
   redis-port:
     description: "Allocated host port for Redis."
     value: ${{ steps.export.outputs.redis-port }}
+  network:
+    description: "Podman network attached to started services (if any)."
+    value: ${{ steps.export.outputs.network }}
+  postgres-container:
+    description: "Container name for the PostgreSQL service."
+    value: ${{ steps.export.outputs.postgres-container }}
+  redis-container:
+    description: "Container name for the Redis service."
+    value: ${{ steps.export.outputs.redis-container }}
 
 runs:
   using: "composite"
