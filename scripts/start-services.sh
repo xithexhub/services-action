@@ -73,7 +73,7 @@ start_postgresql() {
 
   podman rm -f "$container" >/dev/null 2>&1 || true
 
-  local memory_limit="${POSTGRES_MEMORY_LIMIT:-2g}"
+  local memory_limit="${POSTGRES_MEMORY_LIMIT:-1g}"
   local swap_limit="${POSTGRES_MEMORY_SWAP_LIMIT:-0}"
 
   local run_args=(
@@ -136,7 +136,7 @@ start_redis() {
 
   podman rm -f "$container" >/dev/null 2>&1 || true
 
-  local memory_limit="${REDIS_MEMORY_LIMIT:-512m}"
+  local memory_limit="${REDIS_MEMORY_LIMIT:-256m}"
   local swap_limit="${REDIS_MEMORY_SWAP_LIMIT:-0}"
 
   local run_args=(

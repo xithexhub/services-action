@@ -47,9 +47,9 @@ variables before the action step:
 
 | Environment variable           | Default | Description                                         |
 | ------------------------------ | ------- | --------------------------------------------------- |
-| `POSTGRES_MEMORY_LIMIT`        | `2g`    | Podman `--memory` limit for the PostgreSQL service  |
+| `POSTGRES_MEMORY_LIMIT`        | `1g`    | Podman `--memory` limit for the PostgreSQL service  |
 | `POSTGRES_MEMORY_SWAP_LIMIT`   | _none_  | Optional Podman `--memory-swap` value               |
-| `REDIS_MEMORY_LIMIT`           | `512m`  | Podman `--memory` limit for the Redis service       |
+| `REDIS_MEMORY_LIMIT`           | `256m`  | Podman `--memory` limit for the Redis service       |
 | `REDIS_MEMORY_SWAP_LIMIT`      | _none_  | Optional Podman `--memory-swap` value               |
 
 ## Requirements
