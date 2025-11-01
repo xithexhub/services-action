@@ -73,6 +73,9 @@ start_postgresql() {
 
   podman rm -f "$container" >/dev/null 2>&1 || true
 
+  local memory_limit="${POSTGRES_MEMORY_LIMIT:-2g}"
+  local swap_limit="${POSTGRES_MEMORY_SWAP_LIMIT:-0}"
+
   local run_args=(
     --detach
     --replace
@@ -81,7 +84,12 @@ start_postgresql() {
     --env "POSTGRES_USER=postgres"
     --env "POSTGRES_DB=postgres"
     --publish "${host_port}:5432"
+    --memory "$memory_limit"
   )
+
+  if [[ "$swap_limit" != "0" ]]; then
+    run_args+=(--memory-swap "$swap_limit")
+  fi
 
   if [[ -n "${NETWORK:-}" ]]; then
     run_args+=(--network "$NETWORK")
@@ -128,12 +136,20 @@ start_redis() {
 
   podman rm -f "$container" >/dev/null 2>&1 || true
 
+  local memory_limit="${REDIS_MEMORY_LIMIT:-512m}"
+  local swap_limit="${REDIS_MEMORY_SWAP_LIMIT:-0}"
+
   local run_args=(
     --detach
     --replace
     --name "$container"
     --publish "${host_port}:6379"
+    --memory "$memory_limit"
   )
+
+  if [[ "$swap_limit" != "0" ]]; then
+    run_args+=(--memory-swap "$swap_limit")
+  fi
 
   if [[ -n "${NETWORK:-}" ]]; then
     run_args+=(--network "$NETWORK")

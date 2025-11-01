@@ -39,6 +39,19 @@ environment variables for subsequent steps):
 | `redis-port`        | `16379`   | Base host port (auto-increments if already used) |
 | `network`           | _(empty)_ | Optional Podman network to join                  |
 
+### Resource limits
+
+PostgreSQL and Redis containers are started with sensible memory caps so they
+cannot OOM the runner host. Override these limits by exporting environment
+variables before the action step:
+
+| Environment variable           | Default | Description                                         |
+| ------------------------------ | ------- | --------------------------------------------------- |
+| `POSTGRES_MEMORY_LIMIT`        | `2g`    | Podman `--memory` limit for the PostgreSQL service  |
+| `POSTGRES_MEMORY_SWAP_LIMIT`   | _none_  | Optional Podman `--memory-swap` value               |
+| `REDIS_MEMORY_LIMIT`           | `512m`  | Podman `--memory` limit for the Redis service       |
+| `REDIS_MEMORY_SWAP_LIMIT`      | _none_  | Optional Podman `--memory-swap` value               |
+
 ## Requirements
 
 - Self-hosted runner with Podman and `ss` installed (our standard pool already
